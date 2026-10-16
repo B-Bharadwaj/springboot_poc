@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: order-poc
+
+app:
+  greeting: "Hello from the service"
+
+server:
+  port: 8081
+
