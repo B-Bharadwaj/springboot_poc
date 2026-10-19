@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -30,6 +31,17 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAll() {
         return ResponseEntity.ok(productService.getAll());
+    }
+
+    // @RequestParam binds a URL query parameter (?name=...) to the method parameter.
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponse>> searchByName(@RequestParam String name) {
+        return ResponseEntity.ok(productService.searchByName(name));
+    }
+
+    @GetMapping("/cheap")
+    public ResponseEntity<List<ProductResponse>> findCheaperThan(@RequestParam double maxPrice) {
+        return ResponseEntity.ok(productService.findCheaperThan(maxPrice));
     }
 
     // @PathVariable binds the {id} part of the URL to the method parameter.

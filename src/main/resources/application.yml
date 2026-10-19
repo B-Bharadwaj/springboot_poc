@@ -1,10 +1,15 @@
 spring:
   application:
     name: order-poc
+  datasource:
+    url: jdbc:h2:mem:orderdb
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
 
 app:
   greeting: "Hello from the service"
 
 server:
   port: 8081
-

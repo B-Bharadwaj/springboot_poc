@@ -31,6 +31,18 @@ public class ProductService {
         return productMapper.toResponse(findProduct(id));
     }
 
+    public List<ProductResponse> searchByName(String name) {
+        return productRepository.findByName(name).stream()
+                .map(productMapper::toResponse)
+                .toList();
+    }
+
+    public List<ProductResponse> findCheaperThan(double maxPrice) {
+        return productRepository.findByPriceLessThan(maxPrice).stream()
+                .map(productMapper::toResponse)
+                .toList();
+    }
+
     public ProductResponse create(ProductRequest request) {
         Product product = productMapper.toEntity(request);
         return productMapper.toResponse(productRepository.save(product));
