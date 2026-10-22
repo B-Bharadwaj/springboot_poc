@@ -33,8 +33,8 @@ public class DataSeeder implements CommandLineRunner {
         if (productRepository.count() == 0) {
             productRepository.saveAll(List.of(
                     new Product(null, "Laptop", 999.99, 10),
-                    new Product(null, "Mouse", 19.50, 100),
-                    new Product(null, "Keyboard", 49.00, 50)));
+                    new Product(null, "Mouse", 19.50, 10),
+                    new Product(null, "Keyboard", 49.00, 5)));
         }
         List<Product> products = productRepository.findAll();
 

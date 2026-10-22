@@ -10,6 +10,7 @@ Stack: Java 21, Spring Boot, Maven, PostgreSQL (H2 for early days).
 - Add a short comment above each annotation the first time it is used, saying what it does.
 - Write a test with every feature once we reach Phase 5.
 - After each task, list: files changed, what to run, and what I should be able to explain.
+- The app always runs on port 8081. Never remove or change `server.port: 8081` in application.yml, even if a task says to.
 
 ## Commands
 - Run: ./mvnw spring-boot:run
