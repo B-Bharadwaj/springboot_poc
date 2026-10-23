@@ -8,9 +8,14 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// DTO: order JSON returned to the client, flattened.
+// Lombok: generates getters.
 @Getter
+// Lombok: generates setters.
 @Setter
+// Lombok: empty constructor, needed by Jackson for JSON.
 @NoArgsConstructor
+// Lombok: constructor with all fields, in field order.
 @AllArgsConstructor
 public class OrderResponse {
 

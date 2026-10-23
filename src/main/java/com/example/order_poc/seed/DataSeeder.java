@@ -1,4 +1,4 @@
-    package com.example.order_poc.seed;
+package com.example.order_poc.seed;
 
 import com.example.order_poc.model.Order;
 import com.example.order_poc.model.OrderItem;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// Startup seeder: inserts sample data into an empty database.
+// Spring creates and manages this class as a bean.
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -20,6 +22,7 @@ public class DataSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
 
+    // Spring passes in the three repositories (constructor injection).
     public DataSeeder(ProductRepository productRepository, UserRepository userRepository,
                       OrderRepository orderRepository) {
         this.productRepository = productRepository;
@@ -27,17 +30,20 @@ public class DataSeeder implements CommandLineRunner {
         this.orderRepository = orderRepository;
     }
 
-    // @Override tells the compiler this method implements CommandLineRunner.run (compile error if it doesn't).
+    // Implements CommandLineRunner.run; runs once after startup.
     @Override
     public void run(String... args) {
-        if (productRepository.count() == 0) {
-            productRepository.saveAll(List.of(
-                    new Product(null, "Laptop", 999.99, 10),
-                    new Product(null, "Mouse", 19.50, 10),
-                    new Product(null, "Keyboard", 49.00, 5)));
+        // SELECT COUNT; skip seeding if data already exists.
+        if (productRepository.count() > 0) {
+            return;
         }
-        List<Product> products = productRepository.findAll();
+        // INSERTs three products; returns them with generated ids.
+        List<Product> products = productRepository.saveAll(List.of(
+                new Product(null, "Laptop", 999.99, 10, null),
+                new Product(null, "Mouse", 19.50, 10, null),
+                new Product(null, "Keyboard", 49.00, 5, null)));
 
+        // INSERTs three users.
         List<User> users = userRepository.saveAll(List.of(
                 newUser("Alice", "alice@example.com"),
                 newUser("Bob", "bob@example.com"),
@@ -46,18 +52,21 @@ public class DataSeeder implements CommandLineRunner {
         String[] statuses = {"NEW", "PAID", "SHIPPED", "NEW", "DELIVERED"};
         for (int i = 0; i < 5; i++) {
             Order order = new Order();
+            // Cycles through users: Alice, Bob, Carol, Alice, Bob.
             order.setUser(users.get(i % users.size()));
             order.setCreatedAt(LocalDateTime.now().minusDays(5 - i));
             order.setStatus(statuses[i]);
             for (int j = 0; j < 3; j++) {
                 Product product = products.get(j % products.size());
                 OrderItem item = new OrderItem();
+                // Link both sides so cascade saves the item.
                 item.setOrder(order);
                 item.setProduct(product);
                 item.setQuantity(j + 1);
                 item.setUnitPrice(product.getPrice());
                 order.getItems().add(item);
             }
+            // INSERTs the order; cascade also inserts its items.
             orderRepository.save(order);
         }
     }

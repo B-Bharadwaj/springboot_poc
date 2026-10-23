@@ -10,26 +10,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// @Entity marks this class as a JPA entity: each instance is a row in a database table.
+// Entity: one object is one row in products.
+// JPA maps this class to a database table.
 @Entity
-// @Table sets the name of the database table this entity is stored in.
+// Table name in the database.
 @Table(name = "products")
-// @Getter generates a getter method for every field at compile time.
+// Lombok: generates getters.
 @Getter
-// @Setter generates a setter method for every field at compile time.
+// Lombok: generates setters.
 @Setter
-// @NoArgsConstructor generates an empty constructor (Jackson needs it to build objects from JSON).
+// Lombok: empty constructor, required by JPA.
 @NoArgsConstructor
-// @AllArgsConstructor generates a constructor that takes every field as a parameter.
+// Lombok: constructor with all fields, in field order.
 @AllArgsConstructor
 public class Product {
 
-    // @Id marks this field as the table's primary key.
+    // Primary key.
     @Id
-    // @GeneratedValue with IDENTITY lets the database auto-increment the id on insert.
+    // Database auto-increments the id on INSERT.
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private double price;
     private int quantity;
+    private String description;
 }

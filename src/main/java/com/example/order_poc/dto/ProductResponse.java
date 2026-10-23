@@ -5,9 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// DTO: product JSON returned to the client.
+// Lombok: generates getters.
 @Getter
+// Lombok: generates setters.
 @Setter
+// Lombok: empty constructor, needed by Jackson for JSON.
 @NoArgsConstructor
+// Lombok: constructor with all fields, in field order.
 @AllArgsConstructor
 public class ProductResponse {
 
@@ -15,4 +20,5 @@ public class ProductResponse {
     private String name;
     private double price;
     private int quantity;
+    private String description;
 }

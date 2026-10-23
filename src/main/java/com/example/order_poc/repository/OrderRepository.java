@@ -9,14 +9,18 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
+// Repository layer: database access for orders.
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // @Query defines the JPQL query for this method instead of deriving it from the method name.
+    // Custom JPQL query instead of a derived one.
+    // One SELECT that join-fetches user, items and products.
+    // distinct removes duplicate orders produced by the join.
     @Query("select distinct o from Order o join fetch o.user join fetch o.items i join fetch i.product")
     List<Order> findAllWithItems();
 
-    // @EntityGraph makes this query also fetch the listed associations (here: user) in the same SQL via a join.
+    // Joins user into the page query; items load in batches.
     @EntityGraph(attributePaths = "user")
+    // Replaces the inherited findAll(Pageable) to add the graph.
     @Override
     Page<Order> findAll(Pageable pageable);
 }

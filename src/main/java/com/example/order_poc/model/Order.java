@@ -18,28 +18,37 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+// Entity: an order header; owns its order items.
+// JPA maps this class to a database table.
 @Entity
+// Named "orders" because ORDER is reserved in SQL.
 @Table(name = "orders")
+// Lombok: generates getters.
 @Getter
+// Lombok: generates setters.
 @Setter
+// Lombok: empty constructor, required by JPA.
 @NoArgsConstructor
 public class Order {
 
+    // Primary key.
     @Id
+    // Database auto-increments the id on INSERT.
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // @ManyToOne: many orders belong to one user; LAZY means the user is only loaded when first accessed.
+    // Many orders per user; LAZY: user loaded on first access.
     @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn names the foreign-key column in the orders table that points to users.id.
+    // Foreign key column orders.user_id.
     @JoinColumn(name = "user_id")
     private User user;
 
     private LocalDateTime createdAt;
     private String status;
 
-    // @OneToMany: one order has many items; mappedBy says OrderItem.order owns the foreign key,
-    // cascade ALL saves/deletes items with the order, orphanRemoval deletes items removed from this list.
+    // One order, many items; OrderItem.order owns the foreign key.
+    // cascade ALL: saving or deleting the order includes its items.
+    // orphanRemoval: items removed from this list get deleted.
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 }

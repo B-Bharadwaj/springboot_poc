@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// Service layer: order logic; calls repositories and the mapper.
+// Spring creates and manages this class as a bean.
 @Service
 public class OrderService {
 
@@ -30,6 +32,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
 
+    // Spring passes in repositories and mapper (constructor injection).
     public OrderService(OrderRepository orderRepository, UserRepository userRepository,
                         ProductRepository productRepository, OrderMapper orderMapper) {
         this.orderRepository = orderRepository;
@@ -38,24 +41,29 @@ public class OrderService {
         this.orderMapper = orderMapper;
     }
 
-    // @Transactional keeps one database session open for the whole method (so lazy loading works);
-    // readOnly = true tells Hibernate nothing will be written, so it can skip change tracking.
+    // One transaction keeps the session open for lazy loading.
+    // readOnly: nothing is written, so Hibernate skips change tracking.
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrdersSlow() {
+        // SELECT orders only; the mapper triggers extra SELECTs (N+1).
         return orderRepository.findAll().stream()
                 .map(orderMapper::toResponse)
                 .toList();
     }
 
+    // Read-only transaction.
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrdersFast() {
+        // One SELECT with joins loads everything at once.
         return orderRepository.findAllWithItems().stream()
                 .map(orderMapper::toResponse)
                 .toList();
     }
 
+    // Read-only transaction.
     @Transactional(readOnly = true)
     public PageResponse<OrderResponse> getOrdersPage(Pageable pageable) {
+        // Page SELECT with OFFSET/LIMIT, plus a COUNT query.
         Page<Order> page = orderRepository.findAll(pageable);
         List<OrderResponse> content = page.getContent().stream()
                 .map(orderMapper::toResponse)
@@ -64,10 +72,10 @@ public class OrderService {
                 page.getTotalElements(), page.getTotalPages());
     }
 
-    // @Transactional (read-write) runs the whole method in one database transaction:
-    // if any exception is thrown, every change made so far (stock updates, the order) is rolled back.
+    // Read-write transaction: any exception rolls back all changes.
     @Transactional
     public OrderResponse placeOrder(PlaceOrderRequest request) {
+        // SELECT user; lambda throws 404 if not found.
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + request.getUserId()));
 
@@ -77,25 +85,30 @@ public class OrderService {
         order.setCreatedAt(LocalDateTime.now());
 
         for (OrderLineRequest line : request.getItems()) {
+            // SELECT product; lambda throws 404 if not found.
             Product product = productRepository.findById(line.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + line.getProductId()));
 
             if (product.getQuantity() < line.getQuantity()) {
+                // 409 Conflict; rollback undoes earlier stock changes too.
                 throw new InsufficientStockException("Insufficient stock for product '" + product.getName()
                         + "' (id " + product.getId() + "): requested " + line.getQuantity()
                         + ", available " + product.getQuantity());
             }
             product.setQuantity(product.getQuantity() - line.getQuantity());
+            // UPDATE stock; dirty checking would also save it.
             productRepository.save(product);
 
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(line.getQuantity());
+            // Keep the price at order time.
             item.setUnitPrice(product.getPrice());
             order.getItems().add(item);
         }
 
+        // INSERT order; cascade inserts items; commits on return.
         return orderMapper.toResponse(orderRepository.save(order));
     }
 }

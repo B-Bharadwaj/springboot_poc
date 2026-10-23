@@ -3,5 +3,6 @@ package com.example.order_poc.repository;
 import com.example.order_poc.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+// Repository layer: database access for users; inherited CRUD only.
 public interface UserRepository extends JpaRepository<User, Long> {
 }

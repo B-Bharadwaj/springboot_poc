@@ -1,18 +1,29 @@
+# Spring Boot settings, read at startup.
 spring:
   application:
+    # Name shown in every log line.
     name: order-poc
   datasource:
-    url: jdbc:h2:mem:orderdb
+    # PostgreSQL database orderdb on this machine.
+    url: jdbc:postgresql://localhost:5432/orderdb
+    # Database login.
+    username: orderuser
+    password: orderpass
   jpa:
+    # Print every SQL statement to the console.
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      # Only check tables match entities; Flyway creates them.
+      ddl-auto: validate
     properties:
       hibernate:
+        # Load lazy data for up to 10 parents per query.
         default_batch_fetch_size: 10
 
+# Custom setting, read by GreetingService via @Value.
 app:
   greeting: "Hello from the service"
 
 server:
+  # Port 8080 is taken on this machine; keep 8081.
   port: 8081
