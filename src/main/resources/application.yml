@@ -1,8 +1,8 @@
-# Spring Boot settings, read at startup.
+# Spring Boot settings, same for every profile.
 spring:
-  # Loads application-local.yml, which holds the real login.
+  # dev adds SQL/debug logs; local holds the real login.
   profiles:
-    active: local
+    active: dev,local
   application:
     # Name shown in every log line.
     name: order-poc
@@ -13,8 +13,8 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD}
   jpa:
-    # Print every SQL statement to the console.
-    show-sql: true
+    # Close the DB session before JSON is written.
+    open-in-view: false
     hibernate:
       # Only check tables match entities; Flyway creates them.
       ddl-auto: validate
@@ -23,7 +23,7 @@ spring:
         # Load lazy data for up to 10 parents per query.
         default_batch_fetch_size: 10
 
-# Custom setting, read by GreetingService via @Value.
+# Custom settings, bound to AppProperties.
 app:
   greeting: "Hello from the service"
 

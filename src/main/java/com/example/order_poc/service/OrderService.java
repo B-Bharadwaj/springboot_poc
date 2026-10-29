@@ -14,6 +14,7 @@ import com.example.order_poc.model.User;
 import com.example.order_poc.repository.OrderRepository;
 import com.example.order_poc.repository.ProductRepository;
 import com.example.order_poc.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ import java.util.List;
 // Service layer: order logic; calls repositories and the mapper.
 // Spring creates and manages this class as a bean.
 @Service
+// Lombok: creates a "log" logger for this class.
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -75,6 +78,7 @@ public class OrderService {
     // Read-write transaction: any exception rolls back all changes.
     @Transactional
     public OrderResponse placeOrder(PlaceOrderRequest request) {
+        log.info("Placing order for user {} with {} lines", request.getUserId(), request.getItems().size());
         // SELECT user; lambda throws 404 if not found.
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + request.getUserId()));
@@ -90,6 +94,8 @@ public class OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + line.getProductId()));
 
             if (product.getQuantity() < line.getQuantity()) {
+                log.warn("Insufficient stock for product {}: requested {}, available {}",
+                        product.getId(), line.getQuantity(), product.getQuantity());
                 // 409 Conflict; rollback undoes earlier stock changes too.
                 throw new InsufficientStockException("Insufficient stock for product '" + product.getName()
                         + "' (id " + product.getId() + "): requested " + line.getQuantity()
@@ -109,6 +115,8 @@ public class OrderService {
         }
 
         // INSERT order; cascade inserts items; commits on return.
-        return orderMapper.toResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        log.info("Placed order {} with {} lines", saved.getId(), saved.getItems().size());
+        return orderMapper.toResponse(saved);
     }
 }

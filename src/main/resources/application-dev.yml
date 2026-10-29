@@ -1,0 +1,10 @@
+# Dev profile: verbose output for local development.
+spring:
+  jpa:
+    # Print every SQL statement to the console.
+    show-sql: true
+
+logging:
+  level:
+    # Show our own debug logs.
+    com.example.order_poc: DEBUG

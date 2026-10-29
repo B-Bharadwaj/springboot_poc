@@ -1,6 +1,6 @@
 package com.example.order_poc.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.order_poc.config.AppProperties;
 import org.springframework.stereotype.Service;
 
 // Service layer: returns the greeting text for /hello.
@@ -8,14 +8,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class GreetingService {
 
-    private final String greeting;
+    private final AppProperties appProperties;
 
-    // @Value injects app.greeting from application.yml at startup.
-    public GreetingService(@Value("${app.greeting}") String greeting) {
-        this.greeting = greeting;
+    // Spring passes in the typed config (constructor injection).
+    public GreetingService(AppProperties appProperties) {
+        this.appProperties = appProperties;
     }
 
     public String greet() {
-        return greeting;
+        return appProperties.greeting();
     }
+
+    // Old Day 3 version using @Value, kept for comparison.
+    // private final String greeting;
+    //
+    // public GreetingService(@Value("${app.greeting}") String greeting) {
+    //     this.greeting = greeting;
+    // }
+    //
+    // public String greet() {
+    //     return greeting;
+    // }
 }

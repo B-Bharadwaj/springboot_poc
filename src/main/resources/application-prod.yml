@@ -1,0 +1,12 @@
+# Prod profile: quiet logs; secrets come from env vars.
+spring:
+  jpa:
+    # Never print SQL in production.
+    show-sql: false
+
+logging:
+  level:
+    # Libraries log warnings and errors only.
+    root: WARN
+    # Our code logs info, e.g. placed orders.
+    com.example.order_poc: INFO
