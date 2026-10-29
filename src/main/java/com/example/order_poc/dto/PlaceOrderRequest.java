@@ -27,7 +27,6 @@ public class PlaceOrderRequest {
 
     // Rejects a missing or empty list.
     @NotEmpty(message = "items must contain at least one line")
-    // Also validates every OrderLineRequest inside the list.
-    @Valid
-    private List<OrderLineRequest> items;
+    // @Valid on the type argument validates every list element.
+    private List<@Valid OrderLineRequest> items;
 }
