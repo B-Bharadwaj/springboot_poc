@@ -1,5 +1,6 @@
 package com.example.order_poc.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,10 +22,14 @@ import java.util.List;
 @AllArgsConstructor
 public class PlaceOrderRequest {
 
+    // Field description and example value shown in Swagger UI.
+    @Schema(description = "Id of the user placing the order", example = "1")
     // Rejects a missing value.
     @NotNull(message = "userId is required")
     private Long userId;
 
+    @Schema(description = "Order lines, at least one",
+            example = "[{\"productId\": 1, \"quantity\": 2}]")
     // Rejects a missing or empty list.
     @NotEmpty(message = "items must contain at least one line")
     // @Valid on the type argument validates every list element.

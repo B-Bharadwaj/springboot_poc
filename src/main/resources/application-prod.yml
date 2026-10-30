@@ -4,6 +4,14 @@ spring:
     # Never print SQL in production.
     show-sql: false
 
+springdoc:
+  api-docs:
+    # Hide the OpenAPI JSON in production.
+    enabled: false
+  swagger-ui:
+    # Hide the Swagger UI page in production.
+    enabled: false
+
 logging:
   level:
     # Libraries log warnings and errors only.
