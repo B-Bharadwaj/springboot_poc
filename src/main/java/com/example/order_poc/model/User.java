@@ -1,5 +1,6 @@
 package com.example.order_poc.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,4 +30,13 @@ public class User {
     private Long id;
     private String name;
     private String email;
+
+    // BCrypt hash; null for seeded users without a password.
+    // Sets column details; here the column name and length.
+    @Column(name = "password_hash", length = 100)
+    private String passwordHash;
+
+    // Stored as text, e.g. "USER"; matches the column default.
+    @Column(nullable = false, length = 20)
+    private String role = "USER";
 }

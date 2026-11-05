@@ -26,6 +26,11 @@ spring:
 # Custom settings, bound to AppProperties.
 app:
   greeting: "Hello from the service"
+  jwt:
+    # Signing key, at least 32 characters; set in application-local.yml.
+    secret: ${JWT_SECRET}
+    # How long a login token stays valid.
+    expiration-minutes: 60
 
 server:
   # Port 8080 is taken on this machine; keep 8081.

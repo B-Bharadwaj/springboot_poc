@@ -5,5 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 // Typed config: holds every "app.*" setting from application.yml.
 // Binds keys under "app" to the record's fields at startup.
 @ConfigurationProperties(prefix = "app")
-public record AppProperties(String greeting) {
+public record AppProperties(String greeting, Jwt jwt) {
+
+    // Nested "app.jwt.*" settings: signing secret and token lifetime.
+    public record Jwt(String secret, long expirationMinutes) {
+    }
 }
