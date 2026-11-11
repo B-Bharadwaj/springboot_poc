@@ -1,0 +1,549 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin: 0 0 16px;
+}
+
+h2 {
+  font-size: 1.15rem;
+  margin: 0 0 12px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.container.narrow {
+  max-width: 440px;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 24px;
+  background: #1f2933;
+  color: #fff;
+}
+
+.nav-links,
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand {
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.nav-links a {
+  color: #cbd2d9;
+  text-decoration: none;
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Brand link looks like the old brand text. */
+.nav-links a.brand {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-links a.brand:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #52606d;
+}
+
+.badge-admin {
+  background: #c05621;
+}
+
+.badge-user {
+  background: #2b6cb0;
+}
+
+/* Buttons */
+button {
+  font: inherit;
+  padding: 7px 14px;
+  border: 1px solid #2b6cb0;
+  border-radius: 4px;
+  background: #2b6cb0;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #2c5282;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #2b6cb0;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #ebf4ff;
+}
+
+.btn-danger {
+  background: #c53030;
+  border-color: #c53030;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #9b2c2c;
+}
+
+.btn-small {
+  padding: 3px 10px;
+  font-size: 0.85rem;
+}
+
+/* Forms */
+label {
+  display: block;
+  font-weight: 600;
+  margin: 10px 0 4px;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #cbd2d9;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e4e7eb;
+  border-radius: 6px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.card > button[type='submit'] {
+  margin-top: 14px;
+}
+
+.hint {
+  color: #616e7c;
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+.field-error {
+  color: #c53030;
+  font-size: 0.82rem;
+  margin-top: 3px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Banners */
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.banner-error {
+  background: #fde8e8;
+  border: 1px solid #c53030;
+  color: #9b2c2c;
+}
+
+.banner-success {
+  background: #e6f6ec;
+  border: 1px solid #2f855a;
+  color: #276749;
+}
+
+.banner-close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.2rem;
+  padding: 0 4px;
+}
+
+.banner-close:hover:not(:disabled) {
+  background: transparent;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #e4e7eb;
+}
+
+.tab {
+  background: transparent;
+  color: #52606d;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  margin-bottom: -2px;
+}
+
+.tab:hover:not(:disabled) {
+  background: transparent;
+  color: #1f2933;
+}
+
+.tab.active {
+  color: #2b6cb0;
+  border-bottom-color: #2b6cb0;
+  font-weight: 600;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e4e7eb;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e4e7eb;
+  vertical-align: top;
+}
+
+th {
+  background: #f0f4f8;
+  font-weight: 600;
+}
+
+.num {
+  text-align: right;
+}
+
+.empty {
+  text-align: center;
+  color: #616e7c;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.actions button + button {
+  margin-left: 6px;
+}
+
+tr.clickable {
+  cursor: pointer;
+}
+
+tr.clickable:hover {
+  background: #f5f9ff;
+}
+
+tr.expanded > td {
+  background: #f8fafc;
+}
+
+table.inner {
+  margin: 4px 0;
+}
+
+/* Page layout pieces */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.filter input,
+.filter select {
+  width: auto;
+}
+
+.order-line {
+  display: grid;
+  grid-template-columns: 60px 1fr 140px auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.line-number {
+  font-weight: 600;
+  padding-bottom: 8px;
+}
+
+.order-line > button {
+  margin-bottom: 4px;
+}
+
+.confirm {
+  border-color: #2f855a;
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.demo-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+/* Method badges */
+.method {
+  display: inline-block;
+  min-width: 52px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+}
+
+.method-get {
+  background: #2f855a;
+}
+
+.method-post {
+  background: #2b6cb0;
+}
+
+.method-put {
+  background: #dd6b20;
+}
+
+.method-delete {
+  background: #c53030;
+}
+
+code {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+/* "Endpoints used" strip */
+.endpoints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  padding: 8px 12px;
+  margin: -8px 0 16px;
+  background: #eef1f4;
+  border: 1px solid #e4e7eb;
+  border-radius: 4px;
+  color: #52606d;
+}
+
+.endpoints-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.endpoint {
+  white-space: nowrap;
+}
+
+/* Endpoint text inside buttons */
+.btn-endpoint {
+  display: block;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 0.7rem;
+  font-weight: normal;
+  color: #d9e2ec;
+}
+
+.btn-secondary .btn-endpoint {
+  color: #7b8794;
+}
+
+/* API activity panel, pinned to the bottom */
+/* Page padding follows the panel height, set live by the resize hook. */
+:root {
+  --panel-height: 220px;
+}
+
+.app {
+  padding-bottom: var(--panel-height);
+}
+
+.activity {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  height: var(--panel-height);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.activity-handle {
+  flex: 0 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f2933;
+  cursor: row-resize;
+  touch-action: none;
+}
+
+/* Grip line in the middle of the handle. */
+.activity-handle::before {
+  content: '';
+  width: 36px;
+  height: 3px;
+  border-radius: 2px;
+  background: #9aa5b1;
+}
+
+.activity-handle:hover::before,
+.activity-handle:focus-visible::before {
+  background: #fff;
+}
+
+.activity-handle:focus-visible {
+  outline: 2px solid #63b3ed;
+  outline-offset: -2px;
+}
+
+.activity-header {
+  flex: 0 0 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  overflow: hidden;
+  background: #f0f4f8;
+}
+
+.activity-header strong {
+  margin-right: auto;
+  font-size: 0.9rem;
+}
+
+.activity-header .btn-small {
+  padding: 1px 10px;
+}
+
+.activity-chevron {
+  min-width: 32px;
+}
+
+.activity-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.activity-body table {
+  border: none;
+  font-size: 0.85rem;
+}
+
+.activity-body th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.activity-body th,
+.activity-body td {
+  padding: 4px 10px;
+}
+
+.status-ok {
+  color: #2f855a;
+  font-weight: 700;
+}
+
+.status-warn {
+  color: #dd6b20;
+  font-weight: 700;
+}
+
+.status-fail {
+  color: #c53030;
+  font-weight: 700;
+}

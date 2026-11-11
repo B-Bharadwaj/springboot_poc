@@ -23,4 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Replaces the inherited findAll(Pageable) to add the graph.
     @Override
     Page<Order> findAll(Pageable pageable);
+
+    // Derived query: one user's orders, by email, with user joined.    @EntityGraph(attributePaths = "user")
+    Page<Order> findByUserEmail(String email, Pageable pageable);
 }

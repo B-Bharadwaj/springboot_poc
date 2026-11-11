@@ -4,9 +4,12 @@ import com.example.order_poc.dto.ErrorResponse;
 import com.example.order_poc.dto.FieldErrorDetail;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -48,6 +51,21 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Parameter '" + ex.getName() + "' has the wrong type", request, null);
     }
 
+    // 400: unknown sort field, e.g. ?sort=nonsense.
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handleBadProperty(PropertyReferenceException ex,
+                                                           HttpServletRequest request) {
+        log.debug("Invalid sort or property '{}' on {}", ex.getPropertyName(), request.getRequestURI());
+        return build(HttpStatus.BAD_REQUEST, "Invalid sort or property: " + ex.getPropertyName(), request, null);
+    }
+
+    // 403: @PreAuthorize denied; also covers AuthorizationDeniedException.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        log.debug("Access denied on {} {}", request.getMethod(), request.getRequestURI());
+        return build(HttpStatus.FORBIDDEN, "Access denied", request, null);
+    }
+
     // 404: unknown product or user id.
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
@@ -73,6 +91,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex,
                                                                   HttpServletRequest request) {
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), request, null);
+    }
+
+    // 409: foreign key blocks the delete; hide database text.
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
+                                                             HttpServletRequest request) {
+        log.warn("Data integrity violation on {} {}", request.getMethod(), request.getRequestURI());
+        return build(HttpStatus.CONFLICT, "This record is referenced by other data and cannot be deleted",
+                request, null);
     }
 
     // 500: anything else; log details, hide them from the client.

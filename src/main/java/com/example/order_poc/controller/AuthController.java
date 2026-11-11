@@ -47,6 +47,12 @@ public class AuthController {
 
     // 200 with a token; 401 on wrong email or password.
     @Operation(summary = "Log in and get a JWT")
+    @ApiResponse(responseCode = "200", description = "Logged in",
+            content = @Content(schema = @Schema(implementation = AuthResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Validation failed or malformed JSON",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "401", description = "Invalid email or password",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));

@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -56,13 +58,21 @@ public class OrderController {
     @ApiResponse(responseCode = "409", description = "Not enough stock",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
-    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody PlaceOrderRequest request) {
+    // Spring passes the logged-in user; getName() is the email.
+    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody PlaceOrderRequest request,
+                                                    Authentication authentication) {
         // 201 Created; the service may throw 404 or 409.
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.placeOrder(request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(orderService.placeOrder(authentication.getName(), request));
     }
 
     // Maps GET /slow; returns 200, demonstrates N+1 queries.
     @Operation(summary = "List orders (N+1 queries demo)")
+    @ApiResponse(responseCode = "200", description = "All orders")
+    @ApiResponse(responseCode = "403", description = "Admin role required",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    // Runs only if the caller has ROLE_ADMIN; else 403.
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/slow")
     public ResponseEntity<List<OrderResponse>> getAllSlow() {
         return ResponseEntity.ok(orderService.getAllOrdersSlow());
@@ -70,6 +80,10 @@ public class OrderController {
 
     // GET /fast: same data as /slow, one query; 200.
     @Operation(summary = "List orders with one join fetch query")
+    @ApiResponse(responseCode = "200", description = "All orders")
+    @ApiResponse(responseCode = "403", description = "Admin role required",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/fast")
     public ResponseEntity<List<OrderResponse>> getAllFast() {
         return ResponseEntity.ok(orderService.getAllOrdersFast());
@@ -78,8 +92,14 @@ public class OrderController {
     // GET /page?page=0&size=2&sort=createdAt,desc; returns 200.
     // Spring builds Pageable from the page, size, sort parameters.
     @Operation(summary = "List orders one page at a time")
+    // No content given: springdoc uses the return type.
+    @ApiResponse(responseCode = "200", description = "One page of orders")
+    @ApiResponse(responseCode = "400", description = "Invalid sort property or parameter",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/page")
-    public ResponseEntity<PageResponse<OrderResponse>> getPage(Pageable pageable) {
-        return ResponseEntity.ok(orderService.getOrdersPage(pageable));
+    public ResponseEntity<PageResponse<OrderResponse>> getPage(Pageable pageable, Authentication authentication) {
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+        return ResponseEntity.ok(orderService.getOrdersPage(authentication.getName(), isAdmin, pageable));
     }
 }

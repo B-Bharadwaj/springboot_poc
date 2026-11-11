@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,10 @@ public class ProductController {
     // GET /search?name=...; 200, or 400 if name is missing.
     // @RequestParam reads ?name= from the URL; required by default.
     @Operation(summary = "Search products by name")
+    // No content given: springdoc uses the return type.
+    @ApiResponse(responseCode = "200", description = "Matching products")
+    @ApiResponse(responseCode = "400", description = "name parameter is missing",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/search")
     public ResponseEntity<List<ProductResponse>> searchByName(@RequestParam String name) {
         return ResponseEntity.ok(productService.searchByName(name));
@@ -61,6 +66,9 @@ public class ProductController {
 
     // GET /cheap?maxPrice=...; 200, or 400 if not a number.
     @Operation(summary = "List products cheaper than maxPrice")
+    @ApiResponse(responseCode = "200", description = "Products below maxPrice")
+    @ApiResponse(responseCode = "400", description = "maxPrice is missing or not a number",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/cheap")
     public ResponseEntity<List<ProductResponse>> findCheaperThan(@RequestParam double maxPrice) {
         return ResponseEntity.ok(productService.findCheaperThan(maxPrice));
@@ -88,6 +96,10 @@ public class ProductController {
             content = @Content(schema = @Schema(implementation = ProductResponse.class)))
     @ApiResponse(responseCode = "400", description = "Validation failed or malformed JSON",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "Admin role required",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    // Runs only if the caller has ROLE_ADMIN; else 403.
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
         // 201 Created with the new product.
@@ -102,6 +114,9 @@ public class ProductController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Product not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "Admin role required",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
         return ResponseEntity.ok(productService.update(id, request));
@@ -110,6 +125,15 @@ public class ProductController {
     // Maps DELETE /{id}: 404 if not found.
     @Operation(summary = "Delete a product")
     @ApiResponse(responseCode = "204", description = "Product deleted")
+    @ApiResponse(responseCode = "400", description = "Id is not a number",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Product not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "409", description = "Product is used in orders",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "Admin role required",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);

@@ -65,9 +65,12 @@ public class OrderService {
 
     // Read-only transaction.
     @Transactional(readOnly = true)
-    public PageResponse<OrderResponse> getOrdersPage(Pageable pageable) {
+    public PageResponse<OrderResponse> getOrdersPage(String email, boolean isAdmin, Pageable pageable) {
         // Page SELECT with OFFSET/LIMIT, plus a COUNT query.
-        Page<Order> page = orderRepository.findAll(pageable);
+        // Admins see every order; users only their own.
+        Page<Order> page = isAdmin
+                ? orderRepository.findAll(pageable)
+                : orderRepository.findByUserEmail(email, pageable);
         List<OrderResponse> content = page.getContent().stream()
                 .map(orderMapper::toResponse)
                 .toList();
@@ -77,11 +80,11 @@ public class OrderService {
 
     // Read-write transaction: any exception rolls back all changes.
     @Transactional
-    public OrderResponse placeOrder(PlaceOrderRequest request) {
-        log.info("Placing order for user {} with {} lines", request.getUserId(), request.getItems().size());
-        // SELECT user; lambda throws 404 if not found.
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + request.getUserId()));
+    public OrderResponse placeOrder(String email, PlaceOrderRequest request) {
+        // SELECT user by the caller's email; 404 if not found.
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found for the current login"));
+        log.info("Placing order for user {} with {} lines", user.getId(), request.getItems().size());
 
         Order order = new Order();
         order.setUser(user);
